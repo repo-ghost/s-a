@@ -3,24 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>For My Orin ❤️</title>
+    <title>For Orin ❤️</title>
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Confetti Library -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
     <style>
+        :root {
+            --primary: #ff3366;
+            --secondary: #ff758c;
+            --bg-grad: linear-gradient(135deg, #ffdde1 0%, #ee9ca7 100%);
+            --glass: rgba(255, 255, 255, 0.65);
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
+            user-select: none;
         }
 
         body {
             font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
-            color: #4a2c2a;
+            background: var(--bg-grad);
+            color: #3d2327;
             min-height: 100dvh;
             overflow-x: hidden;
             position: relative;
@@ -29,10 +37,7 @@
         /* Floating Hearts Background */
         .bg-hearts {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0; width: 100%; height: 100%;
             pointer-events: none;
             z-index: 0;
             overflow: hidden;
@@ -40,21 +45,35 @@
 
         .heart-bg {
             position: absolute;
-            bottom: -100px;
-            color: rgba(255, 255, 255, 0.6);
+            bottom: -50px;
             animation: floatUp linear infinite;
+            opacity: 0.6;
         }
 
         @keyframes floatUp {
-            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-            100% { transform: translateY(-110vh) rotate(360deg); opacity: 0; }
+            0% { transform: translateY(0) scale(0.8) rotate(0deg); opacity: 0.8; }
+            100% { transform: translateY(-110vh) scale(1.2) rotate(360deg); opacity: 0; }
         }
 
-        /* Welcome Screen (To trigger music on mobile) */
+        /* Touch Trail Hearts */
+        .touch-heart {
+            position: fixed;
+            pointer-events: none;
+            font-size: 1.2rem;
+            z-index: 9999;
+            animation: popOut 1s forwards;
+        }
+
+        @keyframes popOut {
+            0% { transform: scale(0.5) translateY(0); opacity: 1; }
+            100% { transform: scale(1.5) translateY(-40px); opacity: 0; }
+        }
+
+        /* 1. ENVELOPE WELCOME SCREEN */
         #welcome-screen {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100dvh;
-            background: radial-gradient(circle, #ff758c 0%, #ff7eb3 100%);
+            background: radial-gradient(circle at center, #ff758c 0%, #ff4b6e 100%);
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -63,63 +82,179 @@
             color: white;
             text-align: center;
             padding: 20px;
-            transition: opacity 0.8s ease;
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .envelope-wrapper {
+            background: #fff;
+            width: 260px;
+            height: 170px;
+            border-radius: 12px;
+            position: relative;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 30px 0;
+            cursor: pointer;
+            animation: floatEnv 3s ease-in-out infinite;
+        }
+
+        .envelope-flap {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #ffe5ec;
+            clip-path: polygon(0 0, 50% 60%, 100% 0);
+            border-radius: 12px;
+        }
+
+        .wax-seal {
+            width: 55px;
+            height: 55px;
+            background: #d90429;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.6rem;
+            box-shadow: 0 4px 12px rgba(217, 4, 41, 0.5);
+            z-index: 2;
+            border: 2px dashed rgba(255,255,255,0.4);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes floatEnv {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-12px); }
         }
 
         #welcome-screen h1 {
             font-family: 'Dancing Script', cursive;
             font-size: 3.5rem;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            text-shadow: 0 4px 10px rgba(0,0,0,0.15);
         }
 
-        .open-btn {
-            margin-top: 30px;
-            padding: 15px 40px;
-            font-size: 1.2rem;
-            background: white;
-            color: #ff758c;
-            border: none;
-            border-radius: 50px;
-            font-weight: 600;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-            cursor: pointer;
-            animation: pulse 1.5s infinite;
+        .tap-hint {
+            margin-top: 15px;
+            font-size: 1rem;
+            background: rgba(255,255,255,0.2);
+            padding: 8px 22px;
+            border-radius: 30px;
+            backdrop-filter: blur(5px);
         }
 
-        /* Main Content */
+        /* 2. MAIN CONTENT */
         #main-content {
             display: none;
             position: relative;
             z-index: 10;
-            max-width: 500px;
+            max-width: 480px;
             margin: 0 auto;
-            padding: 30px 20px 80px 20px;
+            padding: 25px 18px 60px 18px;
             text-align: center;
         }
 
         .glass-card {
-            background: rgba(255, 255, 255, 0.45);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            border-radius: 25px;
-            padding: 25px 20px;
-            margin-bottom: 30px;
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+            background: var(--glass);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1.5px solid rgba(255, 255, 255, 0.8);
+            border-radius: 28px;
+            padding: 28px 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 12px 35px rgba(255, 51, 102, 0.12);
             opacity: 0;
-            transform: translateY(20px);
-            animation: fadeInUp 1s forwards;
+            transform: translateY(25px);
+            animation: fadeInUp 0.9s forwards;
         }
 
         .title {
             font-family: 'Dancing Script', cursive;
-            font-size: 2.8rem;
-            color: #d63447;
-            margin-bottom: 10px;
+            font-size: 2.7rem;
+            color: var(--primary);
+            margin-bottom: 12px;
         }
 
-        /* Couple Photos */
+        /* Vinyl Music Player Card */
+        .music-player-box {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.85);
+            padding: 12px 18px;
+            border-radius: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+            border: 1px solid #fff;
+        }
+
+        .vinyl-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            text-align: left;
+        }
+
+        .vinyl {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #222 15%, #111 40%, #333 50%, #111 70%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+            animation: spin 4s linear infinite;
+            flex-shrink: 0;
+        }
+
+        .vinyl img {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1.5px solid #fff;
+        }
+
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        .song-info h4 {
+            font-size: 0.95rem;
+            color: #d90429;
+            font-weight: 700;
+        }
+
+        .song-info p {
+            font-size: 0.75rem;
+            color: #666;
+        }
+
+        .play-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(255, 51, 102, 0.3);
+        }
+
+        /* Visible Mini YouTube Embed Fallback */
+        #yt-wrapper {
+            overflow: hidden;
+            height: 0;
+            transition: height 0.3s ease;
+            border-radius: 15px;
+            margin-bottom: 15px;
+        }
+        #yt-wrapper.show {
+            height: 160px;
+            margin-bottom: 20px;
+        }
+
+        /* Couple Polaroids */
         .photo-container {
             display: flex;
             justify-content: center;
@@ -131,156 +266,174 @@
         .polaroid {
             background: white;
             padding: 8px 8px 25px 8px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
-            border-radius: 8px;
-            width: 140px;
+            box-shadow: 0 12px 24px rgba(0,0,0,0.12);
+            border-radius: 10px;
+            width: 145px;
             transition: transform 0.3s;
         }
 
         .polaroid img {
             width: 100%;
-            height: 140px;
+            height: 145px;
             object-fit: cover;
-            border-radius: 4px;
+            border-radius: 6px;
         }
 
-        .polaroid.left { transform: rotate(-8deg) translateX(10px); z-index: 1; }
-        .polaroid.right { transform: rotate(8deg) translateX(-10px); z-index: 2; }
+        .polaroid.left { transform: rotate(-7deg) translateX(12px); z-index: 1; }
+        .polaroid.right { transform: rotate(7deg) translateX(-12px); z-index: 2; }
         
         .center-heart {
             position: absolute;
             z-index: 3;
-            font-size: 2.5rem;
-            animation: pulse 1s infinite;
-            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));
+            font-size: 2.6rem;
+            animation: pulse 1.2s infinite;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
         }
 
         .caption {
             font-family: 'Dancing Script', cursive;
-            font-size: 1.2rem;
-            margin-top: 5px;
+            font-size: 1.3rem;
+            margin-top: 6px;
             color: #333;
         }
 
-        /* Music Player Badge */
-        .music-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(255,255,255,0.8);
-            padding: 8px 18px;
-            border-radius: 50px;
-            font-size: 0.85rem;
-            margin-bottom: 20px;
-            color: #d63447;
-            font-weight: 600;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-        }
-
-        .music-bars span {
-            display: inline-block;
-            width: 3px;
-            height: 12px;
-            background: #d63447;
-            margin: 0 1px;
-            animation: equalizer 0.8s infinite;
-        }
-        .music-bars span:nth-child(2) { animation-delay: 0.2s; }
-        .music-bars span:nth-child(3) { animation-delay: 0.4s; }
-
-        @keyframes equalizer {
-            0%, 100% { height: 4px; }
-            50% { height: 14px; }
-        }
-
-        /* Love Letter Text */
         .letter-text {
-            font-size: 1rem;
-            line-height: 1.7;
+            font-size: 0.98rem;
+            line-height: 1.75;
             color: #4a2c2a;
-            margin-bottom: 15px;
-            text-align: center;
+            margin-bottom: 14px;
         }
 
         .highlight {
-            color: #d63447;
+            color: var(--primary);
             font-weight: 600;
+            background: rgba(255, 51, 102, 0.1);
+            padding: 2px 8px;
+            border-radius: 6px;
         }
 
-        /* Proposal Section */
+        /* Reasons Badges */
+        .reasons-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .reason-pill {
+            background: rgba(255,255,255,0.8);
+            padding: 12px 10px;
+            border-radius: 16px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #d90429;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.04);
+        }
+
+        /* Proposal Box */
         .proposal-box {
             position: relative;
-            min-height: 220px;
+            min-height: 250px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
+            overflow: hidden;
         }
 
         .btn-group {
             display: flex;
-            gap: 20px;
+            gap: 16px;
             margin-top: 25px;
             position: relative;
             width: 100%;
             justify-content: center;
-            height: 60px;
+            align-items: center;
+            min-height: 70px;
         }
 
         .btn {
-            padding: 12px 35px;
-            font-size: 1.1rem;
+            padding: 14px 32px;
+            font-size: 1.05rem;
             border: none;
             border-radius: 50px;
             font-weight: 600;
             cursor: pointer;
             font-family: 'Poppins', sans-serif;
-            transition: all 0.2s ease;
-            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+            transition: all 0.25s ease;
+            box-shadow: 0 8px 20px rgba(255, 51, 102, 0.25);
         }
 
         .btn-yes {
-            background: #ff4757;
+            background: linear-gradient(45deg, #ff3366, #ff6b81);
             color: white;
             z-index: 10;
         }
 
         .btn-no {
             background: white;
-            color: #ff4757;
+            color: #ff3366;
+            border: 1.5px solid #ffccd5;
             position: relative;
             z-index: 10;
+            padding: 12px 24px;
+            font-size: 0.95rem;
         }
 
         /* Celebration Screen */
         #celebration {
             display: none;
             text-align: center;
-            padding: 40px 20px;
         }
 
-        #celebration h1 {
-            font-family: 'Dancing Script', cursive;
-            font-size: 3.5rem;
-            color: #d63447;
-            margin-bottom: 15px;
+        /* 3. DEVELOPER / WINGMAN NOTE */
+        .dev-card {
+            background: rgba(25, 25, 35, 0.88);
+            backdrop-filter: blur(12px);
+            color: #fff;
+            border-radius: 22px;
+            padding: 20px;
+            margin-top: 35px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            text-align: left;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.15);
         }
 
-        /* Hidden YouTube Player */
-        #yt-player {
-            position: fixed;
-            bottom: -500px;
-            left: -500px;
-            width: 1px;
-            height: 1px;
-            opacity: 0;
-            pointer-events: none;
+        .dev-pfp {
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2.5px solid #ff3366;
+            flex-shrink: 0;
+            box-shadow: 0 0 15px rgba(255, 51, 102, 0.5);
+        }
+
+        .dev-badge {
+            display: inline-block;
+            background: #ff3366;
+            color: white;
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
+        }
+
+        .dev-text {
+            font-size: 0.85rem;
+            line-height: 1.5;
+            color: #f1f1f1;
         }
 
         @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.08); }
-            100% { transform: scale(1); }
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
         }
 
         @keyframes fadeInUp {
@@ -290,91 +443,133 @@
 </head>
 <body>
 
+    <!-- Local MP3 Audio (Put song.mp3 in your folder for 100% instant play!) -->
+    <audio id="bg-music" loop preload="auto">
+        <source src="song.mp3" type="audio/mpeg">
+    </audio>
+
     <!-- Background Floating Hearts -->
     <div class="bg-hearts" id="bg-hearts"></div>
 
-    <!-- Hidden YouTube Player for "Proticchobi by Bagdhara" -->
-    <div id="yt-player"></div>
-
-    <!-- Welcome Overlay (Triggers Audio) -->
-    <div id="welcome-screen">
-        <h1>Hey Orin...</h1>
-        <p>I made something special just for you.</p>
-        <p style="font-size: 0.85rem; margin-top: 5px; opacity: 0.8;">(Turn up your volume 🎵)</p>
-        <button class="open-btn" onclick="startJourney()">Tap to Open 💌</button>
-    </div>
-
-    <!-- Main Content -->
-    <div id="main-content">
+    <!-- 1. ENVELOPE WELCOME SCREEN -->
+    <div id="welcome-screen" onclick="startJourney()">
+        <h1>For Orin ❤️</h1>
+        <p style="opacity: 0.9; font-size: 0.95rem;">Soad sent you a special love letter...</p>
         
-        <div class="music-badge">
-            <div class="music-bars"><span></span><span></span><span></span></div>
-            Playing: Proticchobi - Bagdhara
+        <div class="envelope-wrapper">
+            <div class="envelope-flap"></div>
+            <div class="wax-seal">💌</div>
         </div>
 
-        <!-- Card 1: Photos -->
-        <div class="glass-card" style="animation-delay: 0.2s;">
-            <h2 class="title">You & Me</h2>
+        <div class="tap-hint">✨ Tap the envelope to open ✨</div>
+    </div>
+
+    <!-- 2. MAIN CONTENT -->
+    <div id="main-content">
+        
+        <!-- Spinning Vinyl Music Bar -->
+        <div class="music-player-box">
+            <div class="vinyl-wrapper">
+                <div class="vinyl" id="vinyl-disc">
+                    <img src="orin.jpg" alt="Orin" onerror="this.src='https://via.placeholder.com/50'">
+                </div>
+                <div class="song-info">
+                    <h4>Proticchobi 🎵</h4>
+                    <p>Bagdhara • Your Favorite</p>
+                </div>
+            </div>
+            <button class="play-btn" id="music-toggle" onclick="toggleMusic()">⏸</button>
+        </div>
+
+        <!-- Visible YouTube Fallback Player (In case song.mp3 isn't uploaded yet) -->
+        <div id="yt-wrapper">
+            <div id="yt-player"></div>
+        </div>
+
+        <!-- Card 1: Polaroid Couple Photos -->
+        <div class="glass-card" style="animation-delay: 0.1s;">
+            <h2 class="title">Soad & Orin</h2>
             <div class="photo-container">
                 <div class="polaroid left">
                     <img src="soad.jpg" alt="Soad" onerror="this.src='https://via.placeholder.com/150?text=Soad'">
                     <div class="caption">Soad</div>
                 </div>
-                <div class="center-heart">❤️</div>
+                <div class="center-heart">💖</div>
                 <div class="polaroid right">
                     <img src="orin.jpg" alt="Orin" onerror="this.src='https://via.placeholder.com/150?text=Orin'">
                     <div class="caption">Orin</div>
                 </div>
             </div>
             <p class="letter-text">
-                From the moment you came into my life, everything started making sense.
+                In a world full of temporary things, you are my forever feeling. Every moment with you feels like magic. ✨
             </p>
         </div>
 
-        <!-- Card 2: The Song & Feelings -->
-        <div class="glass-card" style="animation-delay: 0.6s;">
+        <!-- Card 2: Proticchobi & Feelings -->
+        <div class="glass-card" style="animation-delay: 0.4s;">
             <h2 class="title">My Proticchobi</h2>
             <p class="letter-text">
-                Every time I listen to <span class="highlight">"Proticchobi"</span>, I only see your face in my mind. Just like the song, you have become the reflection of my soul, my peace, and my favorite melody.
+                Whenever <span class="highlight">Proticchobi by Bagdhara</span> plays, my heart immediately whispers your name. You are the reflection of everything I ever prayed for.
             </p>
-            <p class="letter-text">
-                I don't just love you for who you are, I love who I become when I am with you. You are my happiest place, Orin.
-            </p>
+            
+            <div class="reasons-grid">
+                <div class="reason-pill">🌸 Your Prettiest Smile</div>
+                <div class="reason-pill">🎶 Your Music Taste</div>
+                <div class="reason-pill">💫 My Safe Place</div>
+                <div class="reason-pill">❤️ Everything About You</div>
+            </div>
         </div>
 
-        <!-- Card 3: The Proposal -->
-        <div class="glass-card proposal-box" id="proposal-card" style="animation-delay: 1s;">
-            <h2 class="title" style="font-size: 2.4rem;">One Question...</h2>
+        <!-- Card 3: The Big Proposal -->
+        <div class="glass-card proposal-box" id="proposal-card" style="animation-delay: 0.7s;">
+            <h2 class="title" style="font-size: 2.5rem;">Orin...</h2>
             <p class="letter-text" style="font-weight: 600; font-size: 1.1rem;">
-                Orin, will you be mine forever? 💍
+                I want to listen to our favorite songs and grow old with you. Will you be mine forever? 💍
             </p>
             
             <div class="btn-group">
-                <button class="btn btn-yes" onclick="sheSaidYes()">YES! ❤️</button>
+                <button class="btn btn-yes" id="yes-btn" onclick="sheSaidYes()">YES! ❤️</button>
                 <button class="btn btn-no" id="no-btn" onmouseover="moveButton()" ontouchstart="moveButton(event)">No 🙈</button>
             </div>
         </div>
 
-        <!-- Celebration Card (Hidden until she clicks Yes) -->
+        <!-- Card 4: Celebration (Appears after clicking YES) -->
         <div class="glass-card" id="celebration">
-            <h1>YAYYYY! ❤️🎉</h1>
+            <h1 class="title" style="font-size: 3.2rem;">She Said YES! 🎉❤️</h1>
             <div class="photo-container">
-                <div class="polaroid" style="transform: rotate(0deg); width: 180px;">
-                    <img src="orin.jpg" alt="Orin" style="height: 180px;">
-                    <div class="caption">My Forever ❤️</div>
+                <div class="polaroid" style="transform: rotate(0deg); width: 190px;">
+                    <img src="orin.jpg" alt="Orin" style="height: 185px;" onerror="this.src='https://via.placeholder.com/180?text=Orin'">
+                    <div class="caption">Soad's Forever ❤️</div>
                 </div>
             </div>
-            <p class="letter-text" style="font-size: 1.1rem; font-weight: 600;">
-                You just made me the happiest person alive! I love you so much, Orin!
+            <p class="letter-text" style="font-size: 1.05rem; font-weight: 600;">
+                You just made me the happiest guy in the universe! I love you endlessly, Orin! 🥰
             </p>
-            <p style="font-size: 0.9rem; margin-top: 15px; opacity: 0.8;">Now take a screenshot and send it to me! 😘</p>
+            <p style="font-size: 0.85rem; color: #d90429; font-weight: 600; margin-top: 10px;">
+                📸 Take a screenshot and send it to me right now!
+            </p>
+        </div>
+
+        <!-- 3. DEVELOPER / WINGMAN NOTE -->
+        <div class="dev-card">
+            <img src="gohost.jpg" alt="Developer" class="dev-pfp" onerror="this.src='https://via.placeholder.com/70?text=Dev'">
+            <div>
+                <span class="dev-badge">💻 Developer's Note</span>
+                <p class="dev-text">
+                    "As-salamu alaykum Bhabi! 👋 Ei website-ta ami baniyechi. Tai please Soad-ke bolben amake jeno ek cup cha khaway! ☕😄"
+                </p>
+            </div>
         </div>
 
     </div>
 
     <script>
-        // 1. Setup YouTube API for "Proticchobi by Bagdhara" (ID: ZqvxmXSRub8)
-        var player;
+        const audio = document.getElementById('bg-music');
+        let isPlaying = false;
+        let usingYouTube = false;
+        let player;
+
+        // Load YouTube API as Backup
         var tag = document.createElement('script');
         tag.src = "https://www.youtube.com/iframe_api";
         var firstScriptTag = document.getElementsByTagName('script')[0];
@@ -382,12 +577,12 @@
 
         function onYouTubeIframeAPIReady() {
             player = new YT.Player('yt-player', {
-                height: '0',
-                width: '0',
+                height: '160',
+                width: '100%',
                 videoId: 'ZqvxmXSRub8',
                 playerVars: {
                     'autoplay': 0,
-                    'controls': 0,
+                    'controls': 1,
                     'loop': 1,
                     'playlist': 'ZqvxmXSRub8',
                     'playsinline': 1
@@ -395,57 +590,109 @@
             });
         }
 
-        // 2. Start Journey (Triggered on Tap)
+        // Start Journey when Envelope is tapped
         function startJourney() {
-            // Play Song
-            if (player && player.playVideo) {
-                player.playVideo();
-            }
-
-            // Hide welcome screen, show main content
             const welcome = document.getElementById('welcome-screen');
             welcome.style.opacity = '0';
+            welcome.style.transform = 'scale(1.1)';
+            
+            // Try playing local song.mp3 first (100% reliable on mobile)
+            audio.play().then(() => {
+                isPlaying = true;
+                usingYouTube = false;
+            }).catch(() => {
+                // If song.mp3 is not found, automatically fall back to YouTube player!
+                usingYouTube = true;
+                document.getElementById('yt-wrapper').classList.add('show');
+                if (player && player.playVideo) {
+                    player.playVideo();
+                    isPlaying = true;
+                }
+            });
+
             setTimeout(() => {
                 welcome.style.display = 'none';
                 document.getElementById('main-content').style.display = 'block';
                 createHearts();
-            }, 800);
+            }, 700);
         }
 
-        // 3. Runaway "No" Button Logic (Optimized for Phone Screens)
+        // Play / Pause Button
+        function toggleMusic() {
+            const btn = document.getElementById('music-toggle');
+            const vinyl = document.getElementById('vinyl-disc');
+
+            if (!usingYouTube) {
+                if (audio.paused) {
+                    audio.play();
+                    btn.innerText = '⏸';
+                    vinyl.style.animationPlayState = 'running';
+                } else {
+                    audio.pause();
+                    btn.innerText = '▶️';
+                    vinyl.style.animationPlayState = 'paused';
+                }
+            } else if (player) {
+                const state = player.getPlayerState();
+                if (state === 1) {
+                    player.pauseVideo();
+                    btn.innerText = '▶️';
+                    vinyl.style.animationPlayState = 'paused';
+                } else {
+                    player.playVideo();
+                    btn.innerText = '⏸';
+                    vinyl.style.animationPlayState = 'running';
+                }
+            }
+        }
+
+        // Funny Runaway "No" Button with changing texts
         const noBtn = document.getElementById('no-btn');
-        let yesBtn = document.querySelector('.btn-yes');
-        let scale = 1;
+        const yesBtn = document.getElementById('yes-btn');
+        const noTexts = [
+            "Are you sure? 🥺",
+            "Think again! 💔",
+            "Wrong button! 😜",
+            "Soad loves you! ❤️",
+            "Nice try! 🙈",
+            "Only YES allowed! 💍"
+        ];
+        let noCount = 0;
+        let yesScale = 1;
 
         function moveButton(e) {
-            if(e) e.preventDefault(); // Prevents accidental clicking on touchscreens
+            if(e) e.preventDefault();
             
-            // Make the YES button grow bigger every time she tries to click NO
-            scale += 0.15;
-            yesBtn.style.transform = `scale(${scale})`;
+            // Change text on No button
+            noBtn.innerText = noTexts[noCount % noTexts.length];
+            noCount++;
 
-            // Calculate safe boundaries within the proposal card
+            // Grow YES button
+            if (yesScale < 1.6) {
+                yesScale += 0.12;
+                yesBtn.style.transform = `scale(${yesScale})`;
+            }
+
+            // Move NO button randomly inside card
             const card = document.getElementById('proposal-card');
-            const maxX = card.clientWidth - noBtn.clientWidth - 40;
-            const maxY = card.clientHeight - noBtn.clientHeight - 40;
+            const maxX = (card.clientWidth / 2) - 60;
+            const maxY = 70;
 
-            const randomX = Math.floor(Math.random() * maxX) - (maxX / 2);
-            const randomY = Math.floor(Math.random() * maxY) - (maxY / 2);
+            const randomX = (Math.random() * maxX * 2) - maxX;
+            const randomY = (Math.random() * maxY * 2) - maxY;
 
             noBtn.style.transform = `translate(${randomX}px, ${randomY}px)`;
         }
 
-        // 4. When she clicks YES!
+        // When she clicks YES!
         function sheSaidYes() {
             document.getElementById('proposal-card').style.display = 'none';
             const celeb = document.getElementById('celebration');
             celeb.style.display = 'block';
-            
-            // Scroll smoothly to celebration
-            celeb.scrollIntoView({ behavior: 'smooth' });
+            celeb.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
-            // Trigger Confetti Explosion
-            var duration = 5 * 1000;
+            // Massive Confetti Explosion
+            var duration = 6 * 1000;
             var end = Date.now() + duration;
 
             (function frame() {
@@ -454,14 +701,14 @@
                     angle: 60,
                     spread: 55,
                     origin: { x: 0 },
-                    colors: ['#ff4757', '#ff6b81', '#ffffff']
+                    colors: ['#ff3366', '#ff758c', '#ffffff', '#ffb3c6']
                 });
                 confetti({
                     particleCount: 6,
                     angle: 120,
                     spread: 55,
                     origin: { x: 1 },
-                    colors: ['#ff4757', '#ff6b81', '#ffffff']
+                    colors: ['#ff3366', '#ff758c', '#ffffff', '#ffb3c6']
                 });
 
                 if (Date.now() < end) {
@@ -470,26 +717,35 @@
             }());
         }
 
-        // 5. Floating Background Hearts Generator
+        // Background Floating Hearts
         function createHearts() {
             const container = document.getElementById('bg-hearts');
-            const heartSymbols = ['❤️', '💖', '💕', '🌸', '✨'];
+            const symbols = ['❤️', '💖', '💕', '🌸', '✨'];
             
             setInterval(() => {
                 const heart = document.createElement('div');
                 heart.classList.add('heart-bg');
-                heart.innerText = heartSymbols[Math.floor(Math.random() * heartSymbols.length)];
+                heart.innerText = symbols[Math.floor(Math.random() * symbols.length)];
                 heart.style.left = Math.random() * 100 + 'vw';
-                heart.style.fontSize = (Math.random() * 20 + 15) + 'px';
+                heart.style.fontSize = (Math.random() * 18 + 14) + 'px';
                 heart.style.animationDuration = (Math.random() * 3 + 4) + 's';
-                
                 container.appendChild(heart);
-
-                setTimeout(() => {
-                    heart.remove();
-                }, 7000);
-            }, 400);
+                setTimeout(() => heart.remove(), 7000);
+            }, 450);
         }
+
+        // Touch Heart Trail on Mobile Screen
+        document.addEventListener('touchmove', function(e) {
+            if (Math.random() > 0.35) return; // Keep it smooth
+            const touch = e.touches[0];
+            const heart = document.createElement('div');
+            heart.className = 'touch-heart';
+            heart.innerText = '💗';
+            heart.style.left = touch.clientX + 'px';
+            heart.style.top = touch.clientY + 'px';
+            document.body.appendChild(heart);
+            setTimeout(() => heart.remove(), 1000);
+        });
     </script>
 </body>
 </html>
